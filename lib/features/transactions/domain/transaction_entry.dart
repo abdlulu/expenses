@@ -10,6 +10,7 @@ class TransactionEntry {
     required this.timestamp,
     this.createdAt,
     this.updatedAt,
+    this.type,
   });
 
   final String id;
@@ -18,6 +19,9 @@ class TransactionEntry {
   final DateTime timestamp;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final String? type;
+
+  bool get isSettlement => type == 'settlement';
 
   factory TransactionEntry.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? <String, dynamic>{};
@@ -33,6 +37,7 @@ class TransactionEntry {
       timestamp: toDateOrNull(data['timestamp']) ?? DateTime.now(),
       createdAt: toDateOrNull(data['createdAt']),
       updatedAt: toDateOrNull(data['updatedAt']),
+      type: data['type'] as String?,
     );
   }
 

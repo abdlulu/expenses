@@ -20,7 +20,7 @@ class SummaryTab extends StatelessWidget {
         if (snapshot.hasError) {
           return CenteredMessage(
             icon: Icons.error_outline,
-            message: 'Unable to load summary.\n${snapshot.error}',
+            message: 'تعذّر تحميل الملخص.\n${snapshot.error}',
           );
         }
 
@@ -44,15 +44,15 @@ class SummaryTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Current month', style: Theme.of(context).textTheme.titleMedium),
+                    Text('الشهر الحالي', style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 12),
                     SummaryMetric(
-                      label: 'Total',
+                      label: 'الإجمالي',
                       value: currency.format(total),
                       icon: Icons.account_balance_wallet_outlined,
                     ),
                     SummaryMetric(
-                      label: 'Transactions',
+                      label: 'عدد المعاملات',
                       value: count.toString(),
                       icon: Icons.receipt_long_outlined,
                     ),
@@ -67,14 +67,14 @@ class SummaryTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Per-day breakdown', style: Theme.of(context).textTheme.titleMedium),
+                    Text('التفاصيل اليومية', style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 12),
                     if (dailyTotals.isEmpty)
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: CenteredMessage(
                           icon: Icons.event_available_outlined,
-                          message: 'No data yet this month.',
+                          message: 'لا توجد بيانات هذا الشهر بعد.',
                         ),
                       )
                     else
@@ -85,7 +85,7 @@ class SummaryTab extends StatelessWidget {
                         separatorBuilder: (_, __) => const Divider(height: 1),
                         itemBuilder: (context, index) {
                           final entry = dailyTotals[index];
-                          final label = DateFormat('MMM d (EEE)').format(entry.key);
+                          final label = DateFormat('d MMM (EEE)', 'ar').format(entry.key);
                           return ListTile(
                             dense: true,
                             contentPadding: EdgeInsets.zero,

@@ -15,16 +15,17 @@ class AddTransactionTab extends StatelessWidget {
   Future<void> _create(TransactionDraft draft) async {
     try {
       await service.addTransaction(draft);
-      onFeedback('Transaction added successfully');
+      onFeedback('تمت إضافة المعاملة بنجاح');
       focusNode.unfocus();
     } catch (_) {
-      onFeedback('Unable to add transaction', isError: true);
+      onFeedback('تعذّر إضافة المعاملة', isError: true);
       rethrow;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return FocusScope(
       node: focusNode,
       child: SizedBox(
@@ -33,17 +34,35 @@ class AddTransactionTab extends StatelessWidget {
           onTap: () => focusNode.unfocus(),
           behavior: HitTestBehavior.opaque,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Card(
-              elevation: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: TransactionForm(
-                  submitLabel: 'Save transaction',
-                  clearOnSubmit: true,
-                  onSubmit: _create,
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 2, bottom: 16),
+                  child: Text(
+                    'معاملة جديدة',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ),
+                Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(color: theme.colorScheme.outlineVariant),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: TransactionForm(
+                      submitLabel: 'حفظ المعاملة',
+                      clearOnSubmit: true,
+                      onSubmit: _create,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

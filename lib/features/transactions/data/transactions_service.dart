@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../domain/consolidation_record.dart';
 import '../domain/transaction_draft.dart';
 import '../domain/transaction_entry.dart';
 
@@ -10,6 +11,9 @@ class TransactionsService {
 
   CollectionReference<Map<String, dynamic>> get _transactions =>
       _firestore.collection('transactions');
+
+  CollectionReference<Map<String, dynamic>> get _consolidations =>
+      _firestore.collection('consolidations');
 
   Stream<List<TransactionEntry>> watchAll() {
     return _transactions
@@ -73,6 +77,46 @@ class TransactionsService {
 
   Future<void> deleteTransaction(String id) async {
     await _transactions.doc(id).delete();
+  }
+
+  Future<DateTime?> getLastConsolidationDate() async {
+    final snap = await _consolidations
+        .orderBy('settledAt', descending: true)
+        .limit(1)
+        .get();
+    if (snap.docs.isEmpty) return null;
+    final ts = snap.docs.first.data()['settledAt'];
+    if (ts is Timestamp) return ts.toDate().toLocal();
+    return null;
+  }
+
+  Stream<List<TransactionEntry>> watchSince(DateTime? from) {
+    Query<Map<String, dynamic>> query = _transactions.orderBy('timestamp', descending: true);
+    if (from != null) {
+      query = query.where('timestamp', isGreaterThan: Timestamp.fromDate(from));
+    }
+    return query.snapshots().map((snap) => snap.docs.map(TransactionEntry.fromDoc).toList());
+  }
+
+  Stream<List<ConsolidationRecord>> watchConsolidations() {
+    return _consolidations
+        .orderBy('settledAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map(ConsolidationRecord.fromDoc).toList());
+  }
+
+  Future<void> recordConsolidation({
+    required double amount,
+    required DateTime? periodStart,
+    required DateTime settledAt,
+  }) async {
+    await _consolidations.add({
+      'amount': amount,
+      'periodStart': periodStart != null ? Timestamp.fromDate(periodStart) : null,
+      'periodEnd': Timestamp.fromDate(settledAt),
+      'settledAt': Timestamp.fromDate(settledAt),
+      'createdAt': FieldValue.serverTimestamp(),
+    });
   }
 
   /// Fetch a single page of transactions ordered by timestamp desc, then id desc.

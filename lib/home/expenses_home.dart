@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../features/transactions/data/transactions_service.dart';
 import '../features/transactions/presentation/add_transaction_tab.dart';
+import '../features/transactions/presentation/consolidations_tab.dart';
 import '../features/transactions/presentation/history_tab.dart';
 
 class ExpensesHome extends StatefulWidget {
@@ -32,12 +33,13 @@ class _ExpensesHomeState extends State<ExpensesHome> {
     final tabs = [
       AddTransactionTab(service: widget.service, onFeedback: _handleFeedback),
       HistoryTab(service: widget.service, onFeedback: _handleFeedback),
+      ConsolidationsTab(service: widget.service),
     ];
 
-    const titles = ['Add', 'History'];
+    const titles = ['إضافة', 'السجل', 'التسويات'];
 
     return Scaffold(
-      appBar: AppBar(title: Text('Transactions · ${titles[_currentIndex]}')),
+      appBar: AppBar(title: Text('المعاملات · ${titles[_currentIndex]}')),
       body: IndexedStack(index: _currentIndex, children: tabs),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -45,9 +47,13 @@ class _ExpensesHomeState extends State<ExpensesHome> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.add_circle_outlined),
-            label: 'Add',
+            label: 'إضافة',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'السجل'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.handshake_outlined),
+            label: 'التسويات',
+          ),
         ],
       ),
     );

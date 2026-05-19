@@ -10,7 +10,7 @@ class TransactionForm extends StatefulWidget {
     super.key,
     required this.onSubmit,
     this.initialDraft,
-    this.submitLabel = 'Save',
+    this.submitLabel = 'حفظ',
     this.clearOnSubmit = false,
     this.onSuccess,
   });
@@ -52,76 +52,94 @@ class _TransactionFormState extends State<TransactionForm> {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('EEE, MMM d — h:mm a');
+    final dateFormat = DateFormat('EEE، d MMM — h:mm a', 'ar');
+
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // الوصف
           TextFormField(
             controller: _noteController,
-            decoration: const InputDecoration(
-              labelText: 'Note',
-              hintText: 'e.g. Coffee with Alex',
+            decoration: InputDecoration(
+              labelText: 'الوصف',
+              hintText: 'مثال: قهوة مع أحمد',
+              prefixIcon: const Icon(Icons.description_outlined),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
             textCapitalization: TextCapitalization.sentences,
             validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Note is required';
-              }
+              if (value == null || value.trim().isEmpty) return 'الوصف مطلوب';
               return null;
             },
           ),
           const SizedBox(height: 16),
+          // المبلغ
           TextFormField(
             controller: _amountController,
-            decoration: const InputDecoration(
-              labelText: 'Amount',
+            decoration: InputDecoration(
+              labelText: 'المبلغ',
+              hintText: 'مثال: -15.00 أو 100.00',
+              prefixIcon: const Icon(Icons.attach_money_outlined),
               prefixText: '\$ ',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(
+              decimal: true,
+              signed: true,
+            ),
             validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Amount is required';
-              }
+              if (value == null || value.trim().isEmpty) return 'المبلغ مطلوب';
               final parsed = double.tryParse(value.trim());
-              if (parsed == null) {
-                return 'Enter a valid number';
-              }
-              if (parsed <= 0) {
-                return 'Amount must be greater than zero';
-              }
+              if (parsed == null) return 'أدخل رقماً صحيحاً';
+              if (parsed == 0) return 'المبلغ لا يمكن أن يكون صفراً';
               return null;
             },
           ),
           const SizedBox(height: 16),
+          // التاريخ والوقت
           InputDecorator(
-            decoration: const InputDecoration(
-              labelText: 'Date & time',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: 'التاريخ والوقت',
+              prefixIcon: const Icon(Icons.calendar_today_outlined),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(dateFormat.format(_timestamp)),
-              trailing: const Icon(Icons.calendar_today_outlined),
+            child: InkWell(
               onTap: _pickDateTime,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(dateFormat.format(_timestamp)),
+                    const Icon(Icons.edit_calendar_outlined, size: 18),
+                  ],
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
+          // زر الحفظ
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
               icon: _submitting
                   ? const SizedBox(
-                      width: 16,
-                      height: 16,
+                      width: 18,
+                      height: 18,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation(Colors.white),
                       ),
                     )
                   : const Icon(Icons.check),
-              label: Text(widget.submitLabel),
+              label: Text(widget.submitLabel, style: const TextStyle(fontSize: 16)),
               onPressed: _submitting ? null : _handleSubmit,
             ),
           ),
@@ -138,17 +156,13 @@ class _TransactionFormState extends State<TransactionForm> {
       lastDate: DateTime(_timestamp.year + 1),
     );
     if (pickedDate == null) return;
-
     if (!mounted) return;
-
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(_timestamp),
     );
     if (pickedTime == null) return;
-
     if (!mounted) return;
-
     setState(() {
       _timestamp = DateTime(
         pickedDate.year,
@@ -176,12 +190,10 @@ class _TransactionFormState extends State<TransactionForm> {
       if (widget.clearOnSubmit) {
         _noteController.clear();
         _amountController.clear();
-        setState(() {
-          _timestamp = DateTime.now();
-        });
+        setState(() => _timestamp = DateTime.now());
       }
     } catch (_) {
-      // Feedback surfaced by parent SnackBars.
+      // Feedback surfaced by parent.
     } finally {
       if (mounted) setState(() => _submitting = false);
     }

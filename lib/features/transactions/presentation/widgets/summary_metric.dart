@@ -6,11 +6,15 @@ class SummaryMetric extends StatelessWidget {
     required this.label,
     required this.value,
     required this.icon,
+    this.iconColor,
+    this.valueColor,
   });
 
   final String label;
   final String value;
   final IconData icon;
+  final Color? iconColor;
+  final Color? valueColor;
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +22,16 @@ class SummaryMetric extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(icon, color: Theme.of(context).colorScheme.primary),
+          Icon(icon, color: iconColor ?? Theme.of(context).colorScheme.primary),
           const SizedBox(width: 12),
           Expanded(child: Text(label)),
-          Text(value, style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: valueColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
