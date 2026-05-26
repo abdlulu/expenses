@@ -75,9 +75,7 @@ class _TransactionFormState extends State<TransactionForm> {
               labelText: 'الوصف',
               hintText: 'مثال: قهوة مع أحمد',
               prefixIcon: const Icon(Icons.description_outlined),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
             textCapitalization: TextCapitalization.sentences,
             validator: (value) {
@@ -94,14 +92,14 @@ class _TransactionFormState extends State<TransactionForm> {
               hintText: 'مثال: -15.00 أو 100.00',
               prefixIcon: const Icon(Icons.attach_money_outlined),
               prefixText: '\$ ',
-              suffixIcon: IconButton(
-                tooltip: 'تبديل الإشارة',
-                icon: const Icon(Icons.exposure_neg_1_outlined),
-                onPressed: _toggleAmountSign,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              suffixIcon: kIsWeb && defaultTargetPlatform == TargetPlatform.iOS
+                  ? IconButton(
+                      tooltip: 'تبديل الإشارة',
+                      icon: const Icon(Icons.exposure_neg_1_outlined),
+                      onPressed: _toggleAmountSign,
+                    )
+                  : null,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
             keyboardType: _amountKeyboardType,
             validator: (value) {
@@ -118,9 +116,7 @@ class _TransactionFormState extends State<TransactionForm> {
             decoration: InputDecoration(
               labelText: 'التاريخ والوقت',
               prefixIcon: const Icon(Icons.calendar_today_outlined),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: InkWell(
               onTap: _pickDateTime,
@@ -144,9 +140,7 @@ class _TransactionFormState extends State<TransactionForm> {
             child: FilledButton.icon(
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               icon: _submitting
                   ? const SizedBox(
@@ -158,10 +152,7 @@ class _TransactionFormState extends State<TransactionForm> {
                       ),
                     )
                   : const Icon(Icons.check),
-              label: Text(
-                widget.submitLabel,
-                style: const TextStyle(fontSize: 16),
-              ),
+              label: Text(widget.submitLabel, style: const TextStyle(fontSize: 16)),
               onPressed: _submitting ? null : _handleSubmit,
             ),
           ),
