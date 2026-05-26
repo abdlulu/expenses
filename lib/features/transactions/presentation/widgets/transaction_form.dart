@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
 import '../../../transactions/domain/transaction_draft.dart';
@@ -31,6 +32,14 @@ class _TransactionFormState extends State<TransactionForm> {
   late final TextEditingController _amountController;
   late DateTime _timestamp;
   bool _submitting = false;
+
+  TextInputType get _amountKeyboardType {
+    if (kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+      return TextInputType.text;
+    }
+
+    return const TextInputType.numberWithOptions(decimal: true, signed: true);
+  }
 
   @override
   void initState() {
@@ -66,7 +75,9 @@ class _TransactionFormState extends State<TransactionForm> {
               labelText: 'الوصف',
               hintText: 'مثال: قهوة مع أحمد',
               prefixIcon: const Icon(Icons.description_outlined),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             textCapitalization: TextCapitalization.sentences,
             validator: (value) {
@@ -83,12 +94,16 @@ class _TransactionFormState extends State<TransactionForm> {
               hintText: 'مثال: -15.00 أو 100.00',
               prefixIcon: const Icon(Icons.attach_money_outlined),
               prefixText: '\$ ',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              suffixIcon: IconButton(
+                tooltip: 'تبديل الإشارة',
+                icon: const Icon(Icons.exposure_neg_1_outlined),
+                onPressed: _toggleAmountSign,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-              signed: true,
-            ),
+            keyboardType: _amountKeyboardType,
             validator: (value) {
               if (value == null || value.trim().isEmpty) return 'المبلغ مطلوب';
               final parsed = double.tryParse(value.trim());
@@ -103,7 +118,9 @@ class _TransactionFormState extends State<TransactionForm> {
             decoration: InputDecoration(
               labelText: 'التاريخ والوقت',
               prefixIcon: const Icon(Icons.calendar_today_outlined),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: InkWell(
               onTap: _pickDateTime,
@@ -127,7 +144,9 @@ class _TransactionFormState extends State<TransactionForm> {
             child: FilledButton.icon(
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               icon: _submitting
                   ? const SizedBox(
@@ -139,12 +158,24 @@ class _TransactionFormState extends State<TransactionForm> {
                       ),
                     )
                   : const Icon(Icons.check),
-              label: Text(widget.submitLabel, style: const TextStyle(fontSize: 16)),
+              label: Text(
+                widget.submitLabel,
+                style: const TextStyle(fontSize: 16),
+              ),
               onPressed: _submitting ? null : _handleSubmit,
             ),
           ),
         ],
       ),
+    );
+  }
+
+  void _toggleAmountSign() {
+    final text = _amountController.text.trim();
+    final nextText = text.startsWith('-') ? text.substring(1) : '-$text';
+    _amountController.value = TextEditingValue(
+      text: nextText,
+      selection: TextSelection.collapsed(offset: nextText.length),
     );
   }
 
