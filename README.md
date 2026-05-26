@@ -28,3 +28,16 @@ Simple Flutter app to record personal transactions in Cloud Firestore. It ships 
    ```
 
 Firestore collection used: `transactions` with fields `note (String)`, `amount (double)`, `timestamp (Timestamp)`, `createdAt (Timestamp)`, `updatedAt (Timestamp)`. Offline persistence is enabled automatically after Firebase initialization.
+
+## Deploy to GitHub Pages
+
+This repository includes a GitHub Actions workflow at `.github/workflows/deploy-web.yml`.
+After the project is pushed to GitHub, enable Pages with **Settings > Pages > Build and deployment > Source > GitHub Actions**.
+
+For a one-off local web build, run:
+
+```bash
+flutter build web --release --base-href /expenses/
+```
+
+Use `/` instead of `/expenses/` only if the repository is named `<your-user>.github.io`.
